@@ -19,7 +19,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemEntity getById(String id) throws Exception {
-        return itemRepository.findOne(Long.valueOf(id));
+        return itemRepository.findById(Long.valueOf(id)).get();
     }
 
     @Override
@@ -29,25 +29,25 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemEntity> addNewItems(List<ItemEntity> items) throws Exception {
-        List<ItemEntity> savedEntities = new ArrayList<>();
-        for (ItemEntity item : items) {
-            savedEntities.add(itemRepository.save(item));
-        }
-        return savedEntities;
+    	Iterable<ItemEntity> dbEntites = itemRepository.saveAll(items);
+    	
+    	 return StreamSupport
+                 .stream(dbEntites.spliterator(), false)
+                 .collect(Collectors.toList());
     }
 
     @Override
     public ItemEntity updateItem(String id, ItemEntity item) throws Exception {
-        if (itemRepository.exists(Long.valueOf(id)))
+        if (itemRepository.existsById(Long.valueOf(id)))
             return itemRepository.save(item);
         throw new RuntimeException("No such Product exists with Product id -> " + id);
     }
 
     @Override
     public ItemEntity deleteItem(String id) throws Exception {
-        if (itemRepository.exists(Long.valueOf(id))) {
-            ItemEntity u = itemRepository.findOne(Long.valueOf(id));
-            itemRepository.delete(Long.valueOf(id));
+        if (itemRepository.existsById(Long.valueOf(id))) {
+            ItemEntity u = itemRepository.findById(Long.valueOf(id)).get();
+            itemRepository.delete(u);
             return u;
         }
         throw new RuntimeException("No such Product exists with Product id -> " + id);

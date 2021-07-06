@@ -20,9 +20,9 @@ public class AuctionServiceImpl implements  AuctionService{
 	AuctionRepository auctionRepository;
 
 	@Override
-	public Long getById(long id) throws Exception {
-		AuctionItemsEntity auctionItemsEntity = auctionRepository.findOne(id);
-		return auctionItemsEntity != null ? auctionItemsEntity.getAuctionItemId() : null;
+	public AuctionItemsEntity getById(long id) throws Exception {
+		AuctionItemsEntity auctionItemsEntity = auctionRepository.findById(id).get();
+		return auctionItemsEntity != null ? auctionItemsEntity : null;
 	}
 
 	@Override
@@ -33,16 +33,16 @@ public class AuctionServiceImpl implements  AuctionService{
 
 	@Override
 	public AuctionItemsEntity updateAuction(long id, AuctionItemsEntity auctionItem) throws Exception {
-		if(auctionRepository.exists(id))
+		if(auctionRepository.existsById(id))
 			return auctionRepository.save(auctionItem);
 		throw new RuntimeException("No such Auction exists with Auction id -> "+id);
 	}
 
 	@Override
 	public AuctionItemsEntity deleteAuction(long id) throws Exception {
-		if(auctionRepository.exists(id)) {
-			AuctionItemsEntity u = auctionRepository.findOne(Long.valueOf(id));
-			auctionRepository.delete(id);
+		if(auctionRepository.existsById(id)) {
+			AuctionItemsEntity u = auctionRepository.findById(Long.valueOf(id)).get();
+			auctionRepository.delete(u);
 			return u;
 		}
 		throw new RuntimeException("No such Auction exists with Auction id -> "+id);

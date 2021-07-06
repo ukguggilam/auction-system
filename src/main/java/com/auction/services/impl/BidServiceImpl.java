@@ -29,19 +29,22 @@ public class BidServiceImpl implements BidService {
     @Override
     public Response<?> addNewBid(BidsEntity bid) throws Exception {
         Response<?> response = null;
-        AuctionItemsEntity auctionItem = auctionRepository.findOne(bid.getAuctionItems().getAuctionItemId());
+        AuctionItemsEntity auctionItem = auctionRepository.findById(bid.getAuctionItems().getAuctionItemId()).get();
         if(auctionItem != null) {
+        	// not meeting the reserve price
             if (bid.getMaxAutoBidAmount() <= auctionItem.getReservePrice()) {
                 auctionItem.setCurrentBid(bid.getMaxAutoBidAmount());
                 bid.setReserveStatus(false);
                 response = new Response<String>(ResponseTypeEnum.ERROR, AuctionStatusMessages.BID_RESERVE_PRICE_NOT_MET);
             } else {
                 Double maxBidding = getMaxBidding(auctionItem.getBids());
+                //current bid less than existing bidding value
                 if (maxBidding >= bid.getMaxAutoBidAmount()) {
                     bid.setBidStatus(BidStatusEnum.OUTBID.name());
                     response = new Response<String>(ResponseTypeEnum.ERROR, AuctionStatusMessages.MAX_AMOUNT_OUT_BID);
                 }
-                if (bid.getMaxAutoBidAmount() > getMaxBidding(auctionItem.getBids())) {
+                //current bid is max value and make out bid status to existing
+                if (bid.getMaxAutoBidAmount() > maxBidding) {
                     bid.setReserveStatus(true);
                     bid.setBidStatus(BidStatusEnum.MAXBID.name());
                     auctionItem.setCurrentBid(bid.getMaxAutoBidAmount());

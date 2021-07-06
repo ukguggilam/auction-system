@@ -7,7 +7,7 @@ import com.auction.entity.AuctionItemsEntity;
 
 public interface AuctionService {
 
-	Long getById(long id)throws Exception;
+	AuctionItemsEntity getById(long id)throws Exception;
 
 	List<AuctionItemDto> getActiveAuctionItems() throws Exception;
 

@@ -15,7 +15,7 @@ public class UserServiceImpl  implements  UserService{
 
 	@Override
 	public UserEntity getById(String id) throws Exception {
-		return userRepository.findOne(Long.valueOf(id));
+		return userRepository.findById(Long.valueOf(id)).get();
 	}
 
 	@Override
@@ -25,16 +25,16 @@ public class UserServiceImpl  implements  UserService{
 
 	@Override
 	public UserEntity updateUser(String id, UserEntity user) throws Exception {
-		if(userRepository.exists(Long.valueOf(id)))
+		if(userRepository.existsById(Long.valueOf(id)))
 			return userRepository.save(user);
 		throw new RuntimeException("No such user exists with user id -> "+id);
 	}
 
 	@Override
 	public UserEntity deleteUser(String id) throws Exception {
-		if(userRepository.exists(Long.valueOf(id))) {
-			UserEntity u = userRepository.findOne(Long.valueOf(id));
-			userRepository.delete(Long.valueOf(id));
+		if(userRepository.existsById(Long.valueOf(id))) {
+			UserEntity u = userRepository.findById(Long.valueOf(id)).get();
+			userRepository.delete(u);
 			return u;
 		}
 		throw new RuntimeException("No such user exists with user id -> "+id);
